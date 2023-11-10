@@ -1,0 +1,5 @@
+{:paths ["src"]
+ :deps  {clj-kondo/clj-kondo         {:mvn/version "2023.10.20"}
+         metosin/malli               {:mvn/version "0.13.0"}}
+
+ :aliases {:test {:extra-paths ["test"]}}}
