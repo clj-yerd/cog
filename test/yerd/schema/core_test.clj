@@ -3,7 +3,8 @@
    [clojure.test     :refer [deftest is are testing]]
    [malli.core       :as m]
    [malli.transform  :as m.t]
-   [yerd.schema.core :as sut]))
+   [yerd.schema.core :as sut]
+   [yerd.util        :as u]))
 
 (deftest normalize-transforms-test
   ;; decode variations
@@ -46,3 +47,7 @@
     (sut/coerce "33" :int)
     (catch Exception x
       (is (-> x ex-data sut/error?)))))
+
+(deftest coerce2-test
+  (is (= {:a 1}
+         (sut/coerce {:a 1, :b nil} :decode/remove-nil [:map {:decode/remove-nil u/remove-nil}]))))

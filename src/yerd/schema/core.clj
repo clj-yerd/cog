@@ -11,7 +11,8 @@
    [malli.core      :as m]
    [malli.error     :as m.e]
    [malli.transform :as m.t]
-   [yerd.anomaly    :as anom]))
+   [yerd.anomaly    :as anom]
+   [yerd.util       :as u]))
 
 (defn new-error
   [x]
@@ -28,15 +29,22 @@
   (some-> result
           (assoc :summary (m.e/humanize result))))
 
-(def malli-transformers
-  "Map to lookup malli built in transformers by keyword.
+(def remove-nil-transformer
+  (m.t/transformer
+   {:name "remove nil values"
+    :decoders {:map u/remove-nil}
+    :encoders {:map u/remove-nil}}))
+
+(def transformers
+  "Map to lookup built in transformers by keyword.
   Ref: https://github.com/metosin/malli#value-transformation"
-  {:string  m.t/string-transformer
-   :json    m.t/json-transformer
-   :strip   m.t/strip-extra-keys-transformer
-   :default m.t/default-value-transformer
-   :key     m.t/key-transformer
-   :coll    m.t/collection-transformer})
+  {:string     m.t/string-transformer
+   :json       m.t/json-transformer
+   :strip      m.t/strip-extra-keys-transformer
+   :default    m.t/default-value-transformer
+   :key        m.t/key-transformer
+   :coll       m.t/collection-transformer
+   :remove-nil remove-nil-transformer})
 
 (defn normalize-transforms
   "Returns `transforms` in normalized form.
@@ -102,7 +110,7 @@
         (->> transforms
              (mapv (fn [x]
                      (cond
-                       (keyword? x) (get malli-transformers x {:name x})
+                       (keyword? x) (get transformers x {:name x})
                        :else x))))]
     [coder transforms]))
 
